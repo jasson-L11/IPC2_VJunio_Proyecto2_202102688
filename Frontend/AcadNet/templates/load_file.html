@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Load File</title>
+</head>
+<body >
+    <div class="flex space-x-4 bg-black pt-4 text-white">
+        <h1 class="font-mono m-auto text-4xl font-extrabold">Module File</h1>
+    </div>
+    <nav class="flex flex-col space-x-4 bg-black pt-4 text-white justify-center">
+        <ul class="flex space-x-10 bg-black p-2 text-white justify-evenly">
+            <li>
+                <div>
+                    <form method="POST" enctype="multipart/form-data" class="flex items-center gap-10">
+                        <input type="file" name="file" class="text-transparent rounded-lg max-w-40 file:py-2 hover:file:bg-cyan-200" required>
+                        <button type="submit" class="bg-gray-700 font-mono text-2xl hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+                            Cargar Archivo
+                        </button>
+                    </form>
+                </div>
+            </li>
+            <li class="rounded-full bg-gray-700 hover:bg-blue-400 p-2">
+                <a href="{% url 'file_info' %}"> <span class="font-mono font-semibold text-2xl">Procesar Datos</span></a>
+            </li>
+            <li class="rounded-full bg-gray-700 hover:bg-blue-400 p-2">
+                <a href="{% url 'about' %}"> <span class="font-mono font-semibold text-2xl">Limpiar Datos</span></a>
+            </li>
+            <li class="rounded-full bg-gray-700 hover:bg-blue-400 p-2">
+                <a href="{% url 'dashboard' %}"> <span class="font-mono font-semibold text-2xl">Dashboard</span></a>
+            </li>
+        </ul>
+    </nav>
+    <section class="min-h-screen bg-slate-500 flex flex-col items-center gap-4">
+        <h2 class="font-mono mt-4 text-4xl ">Archivo de Entrada</h2>
+        <textarea  class=" bg-gray-300 w-3/4 h-80 resize-none rounded-lg ">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque, maxime voluptatum assumenda autem quae tempore repudiandae debitis ratione provident voluptas quibusdam fuga ipsum dolores itaque, obcaecati numquam. Odio, voluptatibus expedita!
+            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Enim, numquam eaque quia sint fugiat voluptatem ratione architecto aspernatur labore optio quam similique necessitatibus doloribus adipisci error praesentium veritatis soluta laudantium. lorem ipsum dolor sit amet consectetur adipisicing elit. Neque, maxime voluptatum assumenda autem quae tempore repudiandae debitis ratione provident voluptas quibusdam fuga ipsum dolores itaque, obcaecati numquam. Odio, voluptatibus expedita!
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos dolores est maxime exercitationem sequi architecto molestias consectetur, praesentium nihil sapiente tempore dolorum aliquam consequuntur voluptatibus impedit debitis nostrum excepturi. Modi.
+        </textarea>
+        <h2 class="font-mono text-4xl "> Archivo de salida</h2>
+                <textarea  class=" bg-gray-300 w-3/4 h-80 resize-none rounded-lg mb-8 ">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque, maxime voluptatum assumenda autem quae tempore repudiandae debitis ratione provident voluptas quibusdam fuga ipsum dolores itaque, obcaecati numquam. Odio, voluptatibus expedita!
+            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Enim, numquam eaque quia sint fugiat voluptatem ratione architecto aspernatur labore optio quam similique necessitatibus doloribus adipisci error praesentium veritatis soluta laudantium. lorem ipsum dolor sit amet consectetur adipisicing elit. Neque, maxime voluptatum assumenda autem quae tempore repudiandae debitis ratione provident voluptas quibusdam fuga ipsum dolores itaque, obcaecati numquam. Odio, voluptatibus expedita!
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos dolores est maxime exercitationem sequi architecto molestias consectetur, praesentium nihil sapiente tempore dolorum aliquam consequuntur voluptatibus impedit debitis nostrum excepturi. Modi.
+        </textarea>
+    </section>
+</body>
+</html>
