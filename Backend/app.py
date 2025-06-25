@@ -1,8 +1,9 @@
-from flask import Flask, jsonify, request, jsonify, Response
+from flask import Flask, jsonify, request, Response
 from xml.etree import ElementTree as ET
 from listas.Cursos import Cursos
 from listas.Tutores import Tutores
 from listas.Estudiantes import Estudiantes
+import utilidades.Utilidades as utl
 app = Flask(__name__)
 
 usuario_actual = None
@@ -10,12 +11,12 @@ lista_cursos = Cursos()
 lista_tutores = Tutores()
 lista_estudiantes = Estudiantes()
 asignaciones_tutores = {
-    'correctos': 0,
-    'incorrectos': 0
+    'correcto': 0,
+    'incorrecto': 0
     }
 asignaciones_estudiantes = {
-    'correctos': 0,
-    'incorrectos': 0
+    'correcto': 0,
+    'incorrecto': 0
 }
 
 @app.route('/uploadFile', methods=['POST'])
@@ -72,9 +73,9 @@ def uploadFile():
             if existe_curso and existe_tutor:
                 # Asignamos el curso al tutor
                 lista_tutores.asignar_curso(id_tutor, codigo_curso, nombre_curso)
-                asignaciones_tutores['correctos'] += 1
+                asignaciones_tutores['correcto'] += 1
             else:
-                asignaciones_tutores['incorrectos'] += 1
+                asignaciones_tutores['incorrecto'] += 1
 
         # Obtenemos las lista de estudiantes asignados a cada curso
         asignaciones_estudiante = asignaciones.find('c_estudiantes')
@@ -90,16 +91,16 @@ def uploadFile():
                 # Asignamos el curso al estudiante
                 nombre = lista_cursos.obtener_nombre_curso(codigo_curso)
                 lista_estudiantes.asignar_estudiante(carnet_estudiante, codigo_curso, nombre)
-                asignaciones_estudiantes['correctos'] += 1
+                asignaciones_estudiantes['correcto'] += 1
             else:
-                asignaciones_estudiantes['incorrectos'] += 1
+                asignaciones_estudiantes['incorrecto'] += 1
 
         return Response(
             f"Archivo procesado correctamente. \n"
-            f"Asignaciones de tutores: {asignaciones_tutores['correctos']} correctas, "
-            f"{asignaciones_tutores['incorrectos']} incorrectas.\n"
-            f"Asignaciones de estudiantes: {asignaciones_estudiantes['correctos']} correctas, "
-            f"{asignaciones_estudiantes['incorrectos']} incorrectas.",
+            f"Asignaciones de tutores: {asignaciones_tutores['correcto']} correctas, "
+            f"{asignaciones_tutores['incorrecto']} incorrectas.\n"
+            f"Asignaciones de estudiantes: {asignaciones_estudiantes['correcto']} correctas, "
+            f"{asignaciones_estudiantes['incorrecto']} incorrectas.",
             status=200
         )
 
@@ -109,3 +110,31 @@ def uploadFile():
         print(f"Error de sintaxis XML: {e}")
     except Exception as e:
         print(f"Ocurrió un error al leer el archivo: {e}")
+
+@app.route('/uploadFile', methods=['DELETE'])
+def deleteFile():
+
+    if request.method != 'DELETE':
+        return jsonify({'error': 'Method not allowed'}), 405
+    
+    size_cursos = len(lista_cursos.cursos)
+    size_tutores = len(lista_tutores.tutores)
+    size_estudiantes = len(lista_estudiantes.estudiantes)
+
+    if size_cursos == 0 and size_tutores == 0 and size_estudiantes == 0:
+        return jsonify({'error': 'No hay datos para eliminar'}), 404
+    else:
+        lista_cursos.delete_all_courses()
+        lista_tutores.delete_all_tutor()
+        lista_estudiantes.delete_all_students()
+        return jsonify({'message': 'Todos los datos han sido eliminados correctamente'}), 200
+
+@app.route('/uploadFile', methods=['GET'])
+def get_information_system():
+    if request.method != 'GET':
+        return jsonify({'error': 'Method not allowed'}), 405
+    if len(lista_cursos.cursos) == 0 and len(lista_tutores.tutores) == 0 and len(lista_estudiantes.estudiantes) == 0:
+        return jsonify({'error': 'No hay datos para mostrar'}), 404
+    else:
+        xml_to_text = utl.return_text(asignaciones_tutores, asignaciones_estudiantes, len(lista_tutores), len(lista_estudiantes))
+        return Response(xml_to_text, status=200, mimetype='text/plain')
