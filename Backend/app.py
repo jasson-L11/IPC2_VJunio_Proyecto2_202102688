@@ -127,7 +127,7 @@ def deleteFile():
         lista_cursos.delete_all_courses()
         lista_tutores.delete_all_tutor()
         lista_estudiantes.delete_all_students()
-        return jsonify({'message': 'Todos los datos han sido eliminados correctamente'}), 200
+        return Response("Datos eliminados correctamente", status=200)
 
 @app.route('/uploadFile', methods=['GET'])
 def get_information_system():
