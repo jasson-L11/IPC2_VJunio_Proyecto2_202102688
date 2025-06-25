@@ -11,3 +11,17 @@ class Cursos:
     def print_cursos(self):
         for curso in self.cursos:
             print(curso.__str__())
+
+
+    def verificar_curso(self, codigo):
+        for curso in self.cursos:
+            if curso.codigo == codigo:
+                return True
+        return False
+    
+
+    def obtener_nombre_curso(self, codigo):
+        for curso in self.cursos:
+            if curso.codigo == codigo:
+                return curso.nombre
+        return None
