@@ -19,3 +19,10 @@ class Estudiantes:
         for estudiante in self.estudiantes:
             if estudiante.carnet == carnet:
                 estudiante.cursos.agregar_curso(nombre_curso, codigo_curso)
+
+    
+    def delete_all_students(self):
+        self.estudiantes = []
+
+    def __len__(self):
+        return len(self.estudiantes)
