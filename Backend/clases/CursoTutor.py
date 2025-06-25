@@ -1,6 +1,6 @@
-from Curso import Curso
+from clases.Curso import Curso
 from listas.Actividades import Actividades
-from Horario import Horario
+from clases.Horario import Horario
 class CursoTutor(Curso):
     def __init__(self, nombre, codigo):
         super().__init__(nombre, codigo)

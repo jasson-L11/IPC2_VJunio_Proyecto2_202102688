@@ -1,4 +1,4 @@
-from Curso import Curso
+from clases.Curso import Curso
 
 
 class CursoEstudiante(Curso):
