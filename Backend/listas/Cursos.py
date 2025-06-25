@@ -25,3 +25,6 @@ class Cursos:
             if curso.codigo == codigo:
                 return curso.nombre
         return None
+    
+    def delete_all_courses(self):
+        self.cursos = []
