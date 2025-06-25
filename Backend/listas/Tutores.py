@@ -23,3 +23,6 @@ class Tutores:
             if tutor.id_tutor == id_tutor:
                 tutor.cursos.agregar_curso(nombre_curso, codigo_curso)
     
+    def delete_all_tutor(self):
+        self.tutores = []
+    
