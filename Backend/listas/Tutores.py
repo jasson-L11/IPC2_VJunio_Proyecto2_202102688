@@ -25,4 +25,7 @@ class Tutores:
     
     def delete_all_tutor(self):
         self.tutores = []
+
+    def getAllTutores(self):
+        return self.tutores
     

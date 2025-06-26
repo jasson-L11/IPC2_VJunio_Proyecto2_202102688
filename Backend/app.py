@@ -1,10 +1,12 @@
 from flask import Flask, jsonify, request, Response
+from flask_cors import CORS
 from xml.etree import ElementTree as ET
 from listas.Cursos import Cursos
 from listas.Tutores import Tutores
 from listas.Estudiantes import Estudiantes
 import utilidades.Utilidades as utl
 app = Flask(__name__)
+CORS(app)
 
 usuario_actual = None
 lista_cursos = Cursos()
@@ -21,8 +23,8 @@ asignaciones_estudiantes = {
 
 @app.route('/uploadFile', methods=['POST'])
 def uploadFile():
-    #if not usuario_actual == 'admin':
-    #    return jsonify({'error': 'Unauthorized'}), 403
+    if usuario_actual != 'admin':
+        return jsonify({'error': 'Unauthorized'}), 403
     
     if request.method != 'POST':
         return jsonify({'error': 'Method not allowed'}), 405
@@ -95,15 +97,6 @@ def uploadFile():
             else:
                 asignaciones_estudiantes['incorrecto'] += 1
 
-        return Response(
-            f"Archivo procesado correctamente. \n"
-            f"Asignaciones de tutores: {asignaciones_tutores['correcto']} correctas, "
-            f"{asignaciones_tutores['incorrecto']} incorrectas.\n"
-            f"Asignaciones de estudiantes: {asignaciones_estudiantes['correcto']} correctas, "
-            f"{asignaciones_estudiantes['incorrecto']} incorrectas.",
-            status=200
-        )
-
     except FileNotFoundError:
         print(f"Error: Archivo no encontrado")
     except ET.XMLSyntaxError as e:
@@ -111,9 +104,14 @@ def uploadFile():
     except Exception as e:
         print(f"Ocurrió un error al leer el archivo: {e}")
 
+    xml_to_text = utl.return_text(asignaciones_tutores, asignaciones_estudiantes, len(lista_tutores), len(lista_estudiantes))
+    return xml_to_text, 200
+
 @app.route('/uploadFile', methods=['DELETE'])
 def deleteFile():
-
+    if not usuario_actual == 'admin':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
     if request.method != 'DELETE':
         return jsonify({'error': 'Method not allowed'}), 405
     
@@ -127,14 +125,51 @@ def deleteFile():
         lista_cursos.delete_all_courses()
         lista_tutores.delete_all_tutor()
         lista_estudiantes.delete_all_students()
-        return Response("Datos eliminados correctamente", status=200)
+        return jsonify({'message': 'Datos eliminados exitosamente'}), 200
 
-@app.route('/uploadFile', methods=['GET'])
-def get_information_system():
+    
+
+@app.route('/login', methods=['POST'])
+def login():
+    global usuario_actual
+
+    if usuario_actual is not None:
+        return jsonify({'error': 'Ya hay un usuario autenticado'}), 400
+    
+    # Obtenemos los datos del usuario desde la solicitud
+    data = request.get_json()
+    # Extraemos el nombre de usuario y la contraseña
+    username = data.get('username')
+    password = data.get('password')
+
+    # verificamos la consistencia de los datos
+    if not username or not password:
+        return jsonify({'error': 'Faltan datos de autenticación'}), 400
+    
+    if username == 'admin' and password == 'admin':
+        usuario_actual = username
+        return jsonify({'message': 'Inicio de sesión exitoso',"role":0 }), 200
+    
+
+@app.route('/userInformation', methods=['GET'])
+def userInformation():
+    if not usuario_actual or usuario_actual != 'admin':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
     if request.method != 'GET':
         return jsonify({'error': 'Method not allowed'}), 405
-    if len(lista_cursos.cursos) == 0 and len(lista_tutores.tutores) == 0 and len(lista_estudiantes.estudiantes) == 0:
-        return jsonify({'error': 'No hay datos para mostrar'}), 404
-    else:
-        xml_to_text = utl.return_text(asignaciones_tutores, asignaciones_estudiantes, len(lista_tutores), len(lista_estudiantes))
-        return Response(xml_to_text, status=200, mimetype='text/plain')
+    
+    if len(lista_tutores.tutores) == 0 and len(lista_estudiantes.estudiantes) == 0:
+        return jsonify({'error': 'No hay datos disponibles'}), 404
+    
+    data = utl.merge_list_users(lista_tutores.tutores, lista_estudiantes.estudiantes)
+    
+    return jsonify(data), 200
+
+@app.route('/log_out', methods=['POST'])
+def log_out():
+
+    global usuario_actual
+ 
+    usuario_actual = None
+    return jsonify({'message': 'Sesión cerrada exitosamente'}), 200

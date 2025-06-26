@@ -63,3 +63,18 @@ def len_dictionary(dictionary):
     for key in dictionary:
         contador += dictionary[key]
     return contador
+
+def merge_list_users(tutores, estudiantes):
+    merged_dict = {}
+    
+    for tutor in tutores:
+        merged_dict[tutor.id_tutor] = {
+            'nombre': tutor.nombre,
+            'password': tutor.password
+        }
+    for estudiante in estudiantes:
+        merged_dict[estudiante.carnet] = {
+            'nombre': estudiante.nombre,
+            'password': estudiante.password
+        }
+    return merged_dict

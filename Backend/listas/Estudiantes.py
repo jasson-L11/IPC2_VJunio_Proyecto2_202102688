@@ -26,3 +26,6 @@ class Estudiantes:
 
     def __len__(self):
         return len(self.estudiantes)
+    
+    def getAllEstudiantes(self):
+        return self.estudiantes

@@ -11,13 +11,17 @@
     <nav class="flex flex-col space-x-4 bg-black pt-4 text-white justify-center">
         <ul class="flex space-x-10 bg-black p-2 text-white justify-center ">
             <li class=" rounded-full bg-gray-700 hover:bg-blue-400  p-2 ">
-                <a href="#"> <span class="font-mono font-semibold text-2xl">Load File</span></a>
+                <a href="{% url 'loadFile' %}"> <span class="font-mono font-semibold text-2xl">Load File</span></a>
             </li>
             <li class="rounded-full bg-gray-700 hover:bg-blue-400 p-2">
-                <a href="#"> <span class="font-mono font-semibold text-2xl">File information</span></a>
+                <a href="{% url 'informationSystem' %}"> <span class="font-mono font-semibold text-2xl">File information</span></a>
             </li>
             <li class="rounded-full bg-gray-700 hover:bg-blue-400 p-2">
-                <a href="#"> <span class="font-mono font-semibold text-2xl">About</span></a>
+                <a href="{% url 'about' %}"> <span class="font-mono font-semibold text-2xl">About</span></a>
+            </li>
+            <li class="rounded-full bg-gray-700 hover:bg-red-400 p-2">
+                <a href="{% url 'logout'%}"> <span class="font-mono font-semibold text-2xl">Logout</span></a>
+            </li>
     </nav>
 
     <div class="flex items-center justify-center min-h-screen bg-gradient-to-b from-black via-sky-950 to-gray-850">
