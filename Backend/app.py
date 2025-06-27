@@ -150,6 +150,18 @@ def login():
         usuario_actual = username
         return jsonify({'message': 'Inicio de sesión exitoso',"role":0 }), 200
     
+    for tutor in lista_tutores.tutores:
+        if tutor.id_tutor == username and tutor.password == password:
+            usuario_actual = username
+            return jsonify({'message': 'Inicio de sesión exitoso',"role":1 }), 200
+        
+    for estudiante in lista_estudiantes.estudiantes:
+        if estudiante.carnet == username and estudiante.password == password:
+            usuario_actual = username
+            return jsonify({'message': 'Inicio de sesión exitoso',"role":2 }), 200
+        
+    return jsonify({'error': 'Credenciales inválidas'}), 401
+    
 
 @app.route('/userInformation', methods=['GET'])
 def userInformation():
@@ -173,3 +185,50 @@ def log_out():
  
     usuario_actual = None
     return jsonify({'message': 'Sesión cerrada exitosamente'}), 200
+
+@app.route('/uploadScheduleTutor/<string:usuario>', methods=['POST', 'GET'])
+def uploadScheduleTutor(usuario):
+    if not usuario_actual or usuario_actual != usuario:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    if request.method == 'POST':
+        try:
+            file_xml = request.data
+            file_decoded = file_xml.decode('utf-8')
+            root =  ET.fromstring(file_decoded)
+            cursos = root.findall('curso')
+            horarios_diccionario = {}
+            incorrectos = 0
+            correctos = 0
+            for curso in cursos:
+                codigo = curso.get('codigo').strip()
+                cadena = curso.text.strip()
+                exist_course =lista_tutores.verificar_curso_tutor(usuario, codigo)
+                inicio, fin = utl.getHorarios(cadena)
+                if not exist_course or inicio is None or fin is None:
+                    incorrectos += 1
+                    continue
+                nombre_curso = lista_cursos.obtener_nombre_curso(codigo)
+                inicio, fin = utl.getHorarios(cadena)
+                lista_tutores.add_schedule(usuario, codigo, inicio, fin)
+
+                nombre = f"{codigo}-{nombre_curso}"
+                horarios_diccionario[nombre] =  f'{inicio} - {fin}'
+                correctos += 1
+
+            return jsonify(horarios_diccionario), 200
+        
+        except FileNotFoundError:
+            print(f"Error: Archivo no encontrado")
+        except Exception as e:
+            print(f"Ocurrió un error al leer el archivo: {e}")
+    
+    elif request.method == 'GET':
+        horario = lista_tutores.get_schedule(usuario)
+        
+        if horario is None:
+            return jsonify({'error': 'No se encontraron horarios para el tutor'}), 404
+        
+        return jsonify(horario), 200
+        
+        

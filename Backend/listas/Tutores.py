@@ -29,3 +29,23 @@ class Tutores:
     def getAllTutores(self):
         return self.tutores
     
+    def verificar_curso_tutor(self, id_tutor, codigo_curso):
+        for tutor in self.tutores:
+            if tutor.id_tutor == id_tutor:
+                return tutor.cursos.verificar_curso(codigo_curso)
+        return False
+    
+    def add_schedule(self, id_tutor, codigo_curso, inicio, fin):
+        for tutor in self.tutores:
+            if tutor.id_tutor == id_tutor:
+                tutor.cursos.ingresar_hora(codigo_curso, inicio, fin)
+                return
+            
+    def get_schedule(self, id_tutor):
+        for tutor in self.tutores:
+            if tutor.id_tutor == id_tutor:
+                horarios = {}
+                for curso in tutor.cursos.cursos:
+                    horarios.update(curso.to_dict_horario())
+                return horarios
+        return None

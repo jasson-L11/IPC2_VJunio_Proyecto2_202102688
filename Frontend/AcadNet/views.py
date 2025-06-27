@@ -26,9 +26,9 @@ def iniciarSesion(request):
                     'password': password
                 }
                 response = requests.post(f'{url_backend}/login', json=data)
-                response_json = response.json()
+                
                 if response.status_code == 200:
-                    
+                    response_json = response.json()
                     # Verificamos el rol del usuario
                     rol = int(response_json['role'])
 
@@ -38,15 +38,28 @@ def iniciarSesion(request):
                         redirect_url = redirect('dashboard')
                         redirect_url.set_cookie('user', username)
                         return redirect_url
+                    elif rol == 1:
+                        # si el rol es 2, redirigimos al usuario a la página de tutor
+                        redirect_url = redirect('dashboard_tutor', username=username)
+                        redirect_url.set_cookie('user', username)
+                        return redirect_url
+                    elif rol == 2:
+                        print(f"Usuario {username} autenticado con rol de estudiante")
+                        # si el rol es 3, redirigimos al usuario a la página de estudiante
+                        redirect_url = redirect('dashboard')
+                        redirect_url.set_cookie('user', username)
+                        return redirect_url
+
+                elif response.status_code == 401:
+                    #El usuario no existe o las credenciales son incorrectas
+                    redirect_url = redirect('index')
+                    return redirect_url
 
                 else:
                     # si la respuesta no es exitosa, retornamos un error
                     return HttpResponse(f'Error al iniciar sesión: {response_json.get("message", "Unknown error")}', status=response.status_code)
 
-                
-                # retornamos una respuesta HTTP de éxito
-                return HttpResponse('Inicio de sesión exitoso')
-        pass
+                            
     except Exception as e:
         print(f"Error: Error al iniciar sesión {e}")
         return HttpResponse('Error al iniciar sesión', status=500)
@@ -172,3 +185,60 @@ def logout(request):
     except Exception as e:
         print(f"Error: Error al cerrar sesión {e}")
         return HttpResponse('Error al cerrar sesión', status=500)
+    
+def dashboard_tutor(request, username):
+    try:
+        if request.COOKIES.get('user'):
+            username = request.COOKIES.get('user')
+            return render(request, 'dashboard_tutor.html', {'username': username})
+        else:
+            return redirect('iniciarSesion')
+        
+    except Exception as e:
+        print(f"Error: Error al cargar el dashboard del tutor {e}")
+        return HttpResponse('Error al cargar el dashboard del tutor', status=500)
+    
+def horariosTutor(request, username):
+    try:
+        if request.method == 'GET':
+            # Enviamos una solicitud GET al backend para obtener los horarios del tutor
+            return render(request, 'horarios_tutor.html', {'username': username})
+        
+    except Exception as e:
+        print(f"Error: Error al cargar los horarios del tutor {e}")
+        return HttpResponse('Error al cargar los horarios del tutor', status=500)
+    
+def uploadSchedule(request, username):
+    if request.method == 'POST':
+        # creamos una instancia del formulario con los datos del request
+        form = XMLContentForm(request.POST, request.FILES)
+         # validamos el formulario
+        if form.is_valid():
+            # si el formulario es válido, procesamos el archivo XML
+            file = form.cleaned_data['file']
+            # leemos el contenido del archivo XML
+            xml_content = file.read().decode('utf-8')
+
+            # Definimos los headers para la solicitud 
+            headers = {'Content-Type': 'application/xml'}
+            encode_xml_content = xml_content.encode('utf-8')
+            # Obtenemos el rol del usuario desde las cookies
+            username = request.COOKIES.get('user')
+
+            # Enviamos la solicitud POST al backend con el contenido XML
+            response = requests.post(f'{url_backend}/uploadScheduleTutor/{username}', data=encode_xml_content, headers=headers)
+            if response.status_code == 200:
+                response_message = 'Horario subido correctamente'
+                data = response.json()
+                return render(request, 'horarios_tutor.html', {'username': username, 'data': data, 'response_message': response_message})
+            else:
+                return HttpResponse(f'Error al subir el horario: {response.text}', status=response.status_code)
+
+    elif request.method == 'GET':
+        # Enviamos una solicitud GET al backend para obtener los horarios del tutor
+        response = requests.get(f'{url_backend}/uploadScheduleTutor/{username}')
+        if response.status_code == 200:
+            data = response.json()
+            return render(request, 'horarios_tutor.html', {'username': username, 'data': data})
+        else:
+            return HttpResponse('Error al obtener los horarios del tutor', status=response.status_code)

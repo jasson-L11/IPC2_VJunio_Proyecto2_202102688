@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es"></html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Tutor</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br  min-h-screen">
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <span class="text-xl font-bold text-blue-700">AcadNet Tutor</span>
+            <ul class="flex space-x-8">
+                <li>
+                    <a href="{% url 'horariosTutor' username=username %}" class="text-gray-700 hover:text-blue-600 font-medium">Horarios</a>
+                </li>
+                <li>
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Reportes</a>
+                </li>
+                <li>
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Cuadro de Notas</a>
+                </li>
+                <li>
+                    <a href="{% url 'logout' %}" class="text-gray-700 hover:text-red-600 font-medium">Cerrar sesión</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <main class="max-w-7xl mx-auto mt-8 px-4">
+        <!-- Contenido principal aquí -->
+    </main>
+</body>
+</html>

@@ -1,5 +1,5 @@
 from xml.dom import minidom
-
+import re
 def return_text(asignaciones_tutores, asignaciones_estudiantes, numero_tutores, numero_estudiantes):
 
     document = minidom.Document()
@@ -78,3 +78,39 @@ def merge_list_users(tutores, estudiantes):
             'password': estudiante.password
         }
     return merged_dict
+
+def getHorarios(cadena):
+    patron = r'HorarioI:\s*(\d{2}:\d{2})\s*HorarioF:\s*(\d{2}:\d{2})'
+    match = re.search(patron, cadena)
+    hora_inicio = None
+    hora_fin = None
+    if match:
+        hora_inicio = match.group(1)
+        hora_fin = match.group(2)
+
+        if hora_inicio is None or hora_fin is None:
+            temp = cadena.split(' ')
+            contador =0
+            for word in range(temp):
+                if 'HorarioI:' == word:
+                    hora_inicio = temp[contador + 1]
+                elif 'HorarioF:' == word:
+                    hora_fin = temp[contador + 1]
+                
+                if hora_inicio is not None and hora_fin is not None:
+                    break
+                contador += 1
+    else:
+        temp = cadena.split(' ')
+        contador = 0
+        for word in temp:
+            if 'HorarioI:' == word:
+                hora_inicio = temp[contador + 1]
+            elif 'HorarioF:' == word:
+                hora_fin = temp[contador + 1]
+            
+            if hora_inicio is not None and hora_fin is not None:
+                break
+            contador += 1
+
+    return hora_inicio, hora_fin
